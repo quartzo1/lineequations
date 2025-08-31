@@ -3,255 +3,226 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Point-on-Line Checker — Single File</title>
+<title>Point-on-Line — MCQ Quiz (Standalone)</title>
 <style>
-  :root{
-    --bg:#0b0f14; --panel:#121821; --ink:#e6eef8; --muted:#9fb2c5; --accent:#4aa8ff; --ok:#27c46b; --no:#ff5563;
-  }
-  *{ box-sizing:border-box; }
-  html,body{ height:100%; margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial; background:var(--bg); color:var(--ink); }
-  .app{ max-width:900px; margin:0 auto; padding:28px; display:grid; gap:20px; }
-  header h1{ margin:0; font-size:clamp(22px,4vw,34px); letter-spacing:.2px; }
-  header p{ margin:.3rem 0 0 0; color:var(--muted); }
-
-  .card{ background:linear-gradient(180deg,#121821, #0f1620); border:1px solid #1d2a3a; border-radius:16px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,.25); }
-  .grid{ display:grid; gap:16px; }
-  .pair{ display:grid; gap:6px; }
-
-  .problem{
-    display:grid; gap:10px; align-items:center;
-    grid-template-columns: 1fr auto;
-  }
-  .math{ font-size:clamp(18px,3.3vw,28px); }
-  .badge{ background:#0e2235; color:var(--accent); border:1px solid #1d3b58; padding:4px 10px; border-radius:999px; font-size:12px; }
-
-  label{ font-weight:600; color:#d6e6f7; }
-  select, button{
-    width:100%; padding:12px 14px; background:#0e1620; color:var(--ink);
-    border:1px solid #2a3a4c; border-radius:12px; outline:none; font-size:15px;
-  }
-  select:focus, button:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(74,168,255,.2); }
-  button{ cursor:pointer; transition:.15s transform ease,.15s background ease,.15s border-color ease; }
-  button:hover{ transform: translateY(-1px); }
-  .primary{ background:#11253a; border-color:#214768; }
-  .primary:hover{ background:#16304b; }
-  .success{ background:#0f2b20; border-color:#1f6847; }
-  .danger{ background:#2a1013; border-color:#6b2630; }
-  .muted{ background:#0f1620; }
-  .row{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-
-  .result{ font-weight:700; padding:10px 14px; border-radius:12px; }
-  .result.ok{ color:#b6ffd6; background:rgba(39,196,107,.12); border:1px solid rgba(39,196,107,.35); }
-  .result.no{ color:#ffd2d7; background:rgba(255,85,99,.10); border:1px solid rgba(255,85,99,.35); }
-
-  details{ background:#0e1620; border:1px solid #223348; border-radius:12px; padding:12px 14px; }
-  details > summary{ cursor:pointer; font-weight:700; list-style:none; }
-  details > summary::-webkit-details-marker{ display:none; }
-  .explain{ color:var(--muted); margin-top:8px; line-height:1.55; white-space:pre-wrap; }
-
-  .score{ display:flex; gap:10px; flex-wrap:wrap; }
-  .chip{ background:#0e2235; border:1px solid #1d3b58; color:#d6e6f7; padding:6px 10px; border-radius:999px; font-size:13px; }
-  .kpi{ font-weight:800; color:var(--accent); }
-
-  footer{ color:var(--muted); font-size:12px; text-align:center; padding-top:8px; }
+  :root { --bg:#0c1117; --panel:#111827; --card:#0f1721; --ink:#e8eef7; --muted:#9fb0c3; --ok:#18c29c; --no:#ff6b6b; --accent:#4aa8ff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; background: var(--bg); color: var(--ink); }
+  header { padding: 22px 18px; text-align: center; background: linear-gradient(180deg,#0f1826,#0b1220); border-bottom: 1px solid #1f2a3a; }
+  h1 { margin: 0 0 6px; font-weight: 800; letter-spacing: .2px; }
+  .sub { margin: 0; color: var(--muted); }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 18px; }
+  .card { background: linear-gradient(180deg,#121a26, var(--card)); border: 1px solid #223248; border-radius: 14px; padding: 16px; margin: 14px 0; }
+  .qhead { display:flex; flex-wrap:wrap; gap:8px 18px; align-items:baseline; }
+  .eq { font-weight: 800; }
+  .pt { color: var(--muted); }
+  .choices { margin-top: 10px; display:grid; gap:8px; }
+  label.choice { display:flex; gap:8px; align-items:center; padding:8px 10px; border:1px solid #223248; border-radius:10px; cursor:pointer; background:#0b121a; }
+  input[type="radio"] { transform: scale(1.05); }
+  .post { margin-top: 10px; display:flex; gap:8px; align-items:center; }
+  select.revealSel { background:#0b121a; color:var(--ink); border:1px solid #274368; padding:8px 10px; border-radius:10px; min-width:190px; }
+  select.revealSel:disabled { opacity:.55; cursor:not-allowed; }
+  .answerBox { margin-top: 10px; padding:10px; border:1px dashed #2a3c58; border-radius:10px; display:none; }
+  .answerOnly { font-weight:800; color:var(--ok); }
+  .explain { margin-top:6px; color:var(--muted); }
+  .badge { display:inline-block; margin-left:auto; padding:3px 8px; border-radius:999px; font-size:12px; font-weight:800; border:1px solid transparent; }
+  .bCorrect { color: var(--ok); border-color: rgba(24,194,156,.35); background: rgba(24,194,156,.12); }
+  .bWrong { color: var(--no); border-color: rgba(255,107,107,.35); background: rgba(255,107,107,.12); }
+  .actions { position: sticky; bottom: 0; padding: 14px 18px; background: linear-gradient(180deg, rgba(12,17,23,.0), rgba(12,17,23,.95) 40%, rgba(12,17,23,1)); border-top:1px solid #1f2a3a; display:flex; gap:10px; justify-content:center; }
+  button { border:1px solid #274368; background: linear-gradient(180deg,#153152,#0f2440); color:#eaf2ff; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; }
+  button:hover { filter:brightness(1.08); }
+  .ghost { background:transparent; }
+  .score { text-align:center; font-weight:800; margin-top: 6px; }
+  code { background:#0b121a; padding:2px 6px; border-radius:6px; border:1px solid #223248; }
 </style>
 </head>
 <body>
-  <main class="app">
-    <header>
-      <h1>Point-on-Line Checker</h1>
-      <p>Decide whether the given point lies on the given line. Pick your answer from the dropdown, then check. Use the “Show answer &amp; explanation” dropdown to reveal the correct result and working.</p>
-    </header>
+<header>
+  <h1>Point-on-Line — Multiple Choice</h1>
+  <p class="sub">Answer all questions, click <strong>Submit Quiz</strong> once, then use each question’s dropdown to reveal the answer or answer + explanation.</p>
+</header>
 
-    <section class="card grid">
-      <div class="problem">
-        <div class="math" id="equation">y = mx + b</div>
-        <div class="badge">Equation</div>
-      </div>
-      <div class="problem">
-        <div class="math" id="point">(x, y)</div>
-        <div class="badge">Point</div>
-      </div>
+<div class="wrap" id="app"></div>
 
-      <div class="row">
-        <div class="pair">
-          <label for="userAnswer">Is the point on the line?</label>
-          <select id="userAnswer" aria-label="Is the point on the line?">
-            <option value="" selected>Choose your answer…</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </div>
-
-        <div class="pair">
-          <label>&nbsp;</label>
-          <button id="checkBtn" class="primary">Check Answer</button>
-        </div>
-      </div>
-
-      <div id="feedback" class="result" style="display:none;"></div>
-
-      <details id="reveal">
-        <summary>Show answer &amp; explanation</summary>
-        <div class="explain" id="explainText"></div>
-      </details>
-
-      <div class="row">
-        <button id="newBtn" class="muted">New Question</button>
-        <button id="resetBtn" class="danger">Reset Score</button>
-      </div>
-
-      <div class="score">
-        <span class="chip">Correct: <span class="kpi" id="sc">0</span></span>
-        <span class="chip">Incorrect: <span class="kpi" id="si">0</span></span>
-        <span class="chip">Streak: <span class="kpi" id="ss">0</span></span>
-      </div>
-    </section>
-
-    <footer>Tip: The test is whether the point’s y equals <code>m*x + b</code>.</footer>
-  </main>
+<div class="actions">
+  <button id="submitBtn">Submit Quiz</button>
+  <button class="ghost" id="resetBtn">Reset</button>
+</div>
 
 <script>
-(function(){
-  "use strict";
-
-  // Score tracking in-memory (no storage to keep it simple)
-  let scoreCorrect = 0, scoreIncorrect = 0, streak = 0;
-
-  // Current problem state
-  let m=0, b=0, px=0, py=0, isOn=false;
-
-  // DOM elements
-  const eqEl = document.getElementById('equation');
-  const ptEl = document.getElementById('point');
-  const ansSel = document.getElementById('userAnswer');
-  const checkBtn = document.getElementById('checkBtn');
-  const feedback = document.getElementById('feedback');
-  const explainText = document.getElementById('explainText');
-  const reveal = document.getElementById('reveal');
-  const newBtn = document.getElementById('newBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const sc = document.getElementById('sc');
-  const si = document.getElementById('si');
-  const ss = document.getElementById('ss');
-
-  function randInt(min, max){ // inclusive
-    return Math.floor(Math.random()*(max-min+1))+min;
+/* ================== DATA ================== */
+/*
+  Each question object:
+  {
+    id, type: "slope" | "horizontal" | "vertical",
+    m, b, k (for y=k), x0 (for x = x0),
+    x, y (point),
+    choices: ["Yes","No"]   // MC options
   }
+*/
+const QUESTIONS = [
+  // y = 2x + 3 ; (4, 11) -> 11 = 2*4+3 = 11 ✓
+  { id: 1, type: "slope", m: 2, b: 3, x: 4, y: 11, choices: ["Yes","No"] },
+  // y = -x + 5 ; (2, 4) -> RHS = 3 ≠ 4 ✗
+  { id: 2, type: "slope", m: -1, b: 5, x: 2, y: 4, choices: ["Yes","No"] },
+  // y = 0.5x - 1 ; (6, 2) -> RHS = 2 ✓
+  { id: 3, type: "slope", m: 0.5, b: -1, x: 6, y: 2, choices: ["Yes","No"] },
+  // y = 3x ; (1, 4) -> RHS = 3 ≠ 4 ✗
+  { id: 4, type: "slope", m: 3, b: 0, x: 1, y: 4, choices: ["Yes","No"] },
+  // y = -2x + 8 ; (3, 2) -> RHS = 2 ✓
+  { id: 5, type: "slope", m: -2, b: 8, x: 3, y: 2, choices: ["Yes","No"] },
+  // x = 5 ; (5, anything) ✓ here (5, -1) ✓
+  { id: 6, type: "vertical", x0: 5, x: 5, y: -1, choices: ["Yes","No"] }
+];
 
-  function coin(){ return Math.random() < 0.5; }
-
-  function formatNumber(n){
-    // Keep integers as-is; otherwise show with up to 2 decimals
-    if (Number.isInteger(n)) return String(n);
-    return Number(n.toFixed(2)).toString();
+/* ============ HELPERS / MATH ============ */
+const fmt = n => Number.isInteger(n) ? String(n) : String(n).replace(/\.0+$/, "");
+const coeffToStr = (c, sym) => c===1 ? sym : c===-1 ? "-" + sym : fmt(c) + sym;
+function eqToString(q) {
+  if (q.type === "horizontal") return `y = ${fmt(q.k)}`;
+  if (q.type === "vertical")   return `x = ${fmt(q.x0)}`;
+  // slope-intercept
+  const mS = q.m===0 ? "0" : coeffToStr(q.m,"x");
+  const bS = q.b ? (q.b>0 ? ` + ${fmt(q.b)}` : ` - ${fmt(Math.abs(q.b))}`) : "";
+  return `y = ${mS}${q.m===0? (q.b? bS.replace(/^\s\+\s/,"") : "") : bS}`;
+}
+function correctAnswer(q){
+  let on=false;
+  if(q.type==="slope"){
+    on = Math.abs(q.y - (q.m*q.x + q.b)) < 1e-9;
+  } else if(q.type==="horizontal"){
+    on = Math.abs(q.y - q.k) < 1e-9;
+  } else if(q.type==="vertical"){
+    on = Math.abs(q.x - q.x0) < 1e-9;
   }
-
-  function newProblem(){
-    // Random slope and intercept (avoid ultra tiny decimals)
-    const slopes = [-5,-4,-3,-2,-1,-0.5,0,0.5,1,2,3,4,5];
-    m = slopes[randInt(0, slopes.length-1)];
-    b = randInt(-10, 10);
-
-    // Decide whether to craft a point that lies on the line
-    const makeOnLine = coin();
-    if (makeOnLine){
-      px = randInt(-8, 8);
-      py = m*px + b;
-      // If decimal py arises, keep it to 2dp
-      if (!Number.isInteger(py)) py = Number(py.toFixed(2));
-      isOn = true;
-    } else {
-      // Start with a true point then bump y by a small non-zero delta
-      px = randInt(-8, 8);
-      let trueY = m*px + b;
-      if (!Number.isInteger(trueY)) trueY = Number(trueY.toFixed(2));
-      const deltas = [-3,-2,-1,-0.5,0.5,1,2,3];
-      const delta = deltas[randInt(0, deltas.length-1)];
-      py = trueY + delta;
-      if (!Number.isInteger(py)) py = Number(py.toFixed(2));
-      isOn = false;
-    }
-
-    // Render
-    eqEl.textContent = `y = ${formatNumber(m)}x + ${formatNumber(b)}`;
-    ptEl.textContent = `(${formatNumber(px)}, ${formatNumber(py)})`;
-
-    // Reset UI
-    ansSel.value = "";
-    feedback.style.display = "none";
-    feedback.className = "result";
-    feedback.textContent = "";
-    reveal.open = false;
-    explainText.textContent = "";
+  return on ? "Yes" : "No";
+}
+function explanation(q){
+  if(q.type==="horizontal"){
+    return `Line is y = ${fmt(q.k)}. Point’s y = ${fmt(q.y)} → ${fmt(q.y)} ${q.y===q.k ? "=":"≠"} ${fmt(q.k)}.`;
   }
-
-  function updateScoreUI(){
-    sc.textContent = scoreCorrect;
-    si.textContent = scoreIncorrect;
-    ss.textContent = streak;
+  if(q.type==="vertical"){
+    return `Line is x = ${fmt(q.x0)}. Point’s x = ${fmt(q.x)} → ${fmt(q.x)} ${q.x===q.x0 ? "=":"≠"} ${fmt(q.x0)}.`;
   }
+  const rhs = q.m*q.x + q.b;
+  const mS = fmt(q.m), xS = fmt(q.x), bS = (q.b>=0?"+":"-")+" "+fmt(Math.abs(q.b));
+  return `Compute m·x + b = ${mS}·${xS} ${bS} = ${fmt(rhs)}. Compare with point’s y = ${fmt(q.y)} → ${fmt(q.y)} ${Math.abs(q.y-rhs)<1e-9 ? "=":"≠"} ${fmt(rhs)}.`;
+}
 
-  function check(){
-    const val = ansSel.value;
-    if (!val){
-      feedback.style.display = "block";
-      feedback.className = "result no";
-      feedback.textContent = "Pick an answer from the dropdown first.";
+/* ============== RENDER UI ============== */
+const app = document.getElementById("app");
+
+QUESTIONS.forEach((q, idx) => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.id = `q-${q.id}`;
+  const eqText = eqToString(q);
+
+  // Build choices
+  const choicesHTML = q.choices.map((c,i)=>`
+    <label class="choice">
+      <input type="radio" name="q_${q.id}" value="${c}" aria-label="${c}">
+      <span>${String.fromCharCode(65+i)}.</span> <span>${c}</span>
+    </label>
+  `).join("");
+
+  card.innerHTML = `
+    <div class="qhead">
+      <div class="eq">Q${idx+1}. Line: <code>${eqText}</code></div>
+      <div class="pt">Point: (${fmt(q.x)}, ${fmt(q.y)})</div>
+      <span class="badge" id="badge-${q.id}" style="display:none;"></span>
+    </div>
+    <div class="choices" role="radiogroup" aria-labelledby="q-${q.id}-label">
+      ${choicesHTML}
+    </div>
+    <div class="post">
+      <label for="reveal-${q.id}">Reveal:</label>
+      <select id="reveal-${q.id}" class="revealSel" disabled>
+        <option value="hidden">Hidden</option>
+        <option value="ans">Answer only</option>
+        <option value="ansx">Answer + explanation</option>
+      </select>
+    </div>
+    <div class="answerBox" id="abox-${q.id}">
+      <div class="answerOnly" id="ans-${q.id}"></div>
+      <div class="explain" id="exp-${q.id}"></div>
+    </div>
+  `;
+  app.appendChild(card);
+
+  // Hook up the reveal select
+  const sel = card.querySelector(`#reveal-${q.id}`);
+  sel.addEventListener("change", () => {
+    const box = card.querySelector(`#abox-${q.id}`);
+    const ansEl = card.querySelector(`#ans-${q.id}`);
+    const expEl = card.querySelector(`#exp-${q.id}`);
+    if (sel.value === "hidden") {
+      box.style.display = "none";
       return;
     }
-    const userSaysOn = (val === "yes");
-    const correct = userSaysOn === isOn;
+    ansEl.textContent = `Correct answer: ${correctAnswer(q)}`;
+    expEl.textContent = sel.value === "ansx" ? explanation(q) : "";
+    box.style.display = "block";
+  });
+});
 
-    if (correct){
-      feedback.style.display = "block";
-      feedback.className = "result ok";
-      feedback.textContent = "Correct!";
-      scoreCorrect++; streak++;
-    } else {
-      feedback.style.display = "block";
-      feedback.className = "result no";
-      feedback.textContent = "Not quite. Check the explanation below.";
-      scoreIncorrect++; streak = 0;
+/* ============== SUBMIT / RESET ============== */
+document.getElementById("submitBtn").addEventListener("click", () => {
+  let correct = 0;
+
+  QUESTIONS.forEach(q => {
+    const chosen = (document.querySelector(`input[name="q_${q.id}"]:checked`) || {}).value;
+    const truth = correctAnswer(q);
+    const badge = document.getElementById(`badge-${q.id}`);
+    const reveal = document.getElementById(`reveal-${q.id}`);
+
+    if (!chosen) {
+      badge.style.display = "inline-block";
+      badge.className = "badge bWrong";
+      badge.textContent = "No choice";
+      reveal.disabled = false; // still allow reveal after submit
+      return;
     }
-    updateScoreUI();
 
-    // Prepare explanation text
-    // Test: does py === m*px + b (within small tolerance for decimals)?
-    const lhs = py;
-    const rhsRaw = m*px + b;
-    const rhs = Number.isInteger(rhsRaw) ? rhsRaw : Number(rhsRaw.toFixed(2));
-    const tolerance = 1e-9;
-    const equality = Math.abs(lhs - rhs) < tolerance ? "equals" : "does not equal";
-    const final = (Math.abs(lhs - rhs) < tolerance) ? "ON the line" : "NOT on the line";
+    const ok = (chosen === truth);
+    if (ok) correct++;
 
-    const steps =
-`Line:  y = ${formatNumber(m)}x + ${formatNumber(b)}
-Point: (${formatNumber(px)}, ${formatNumber(py)})
+    badge.style.display = "inline-block";
+    badge.className = "badge " + (ok ? "bCorrect" : "bWrong");
+    badge.textContent = ok ? "Correct" : "Incorrect";
 
-Plug in x = ${formatNumber(px)}:
-  y = ${formatNumber(m)}·(${formatNumber(px)}) + ${formatNumber(b)} = ${formatNumber(rhs)}
+    // Enable reveal dropdown after submit
+    reveal.disabled = false;
+  });
 
-Compare with point's y:
-  ${formatNumber(lhs)} ${equality} ${formatNumber(rhs)} → the point is ${final}.`;
-
-    explainText.textContent = steps;
+  // Score (create/update)
+  let scoreEl = document.getElementById("score");
+  if (!scoreEl) {
+    scoreEl = document.createElement("div");
+    scoreEl.id = "score";
+    scoreEl.className = "score";
+    app.appendChild(scoreEl);
   }
+  scoreEl.innerHTML = `Score: <span>${correct}/${QUESTIONS.length}</span>`;
+});
 
-  function resetScore(){
-    scoreCorrect = 0; scoreIncorrect = 0; streak = 0;
-    updateScoreUI();
-  }
-
-  // Wire up
-  checkBtn.addEventListener('click', check);
-  newBtn.addEventListener('click', newProblem);
-  resetBtn.addEventListener('click', resetScore);
-
-  // First load
-  updateScoreUI();
-  newProblem();
-})();
+document.getElementById("resetBtn").addEventListener("click", () => {
+  // radios
+  QUESTIONS.forEach(q => {
+    document.querySelectorAll(`input[name="q_${q.id}"]`).forEach(r => r.checked = false);
+    // badges
+    const badge = document.getElementById(`badge-${q.id}`);
+    badge.style.display = "none";
+    // reveal controls
+    const sel = document.getElementById(`reveal-${q.id}`);
+    sel.value = "hidden";
+    sel.disabled = true;
+    const box = document.getElementById(`abox-${q.id}`);
+    box.style.display = "none";
+  });
+  const scoreEl = document.getElementById("score");
+  if (scoreEl) scoreEl.remove();
+});
 </script>
 </body>
 </html>
